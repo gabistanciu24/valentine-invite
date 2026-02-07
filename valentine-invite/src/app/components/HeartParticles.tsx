@@ -3,7 +3,7 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import { initParticlesEngine, Particles } from "@tsparticles/react";
 import { loadFull } from "tsparticles";
-import type { IOptions } from "tsparticles-engine";
+import type { IOptions } from "tsparticles";
 
 const HeartParticles = () => {
   const [ready, setReady] = useState(false);
