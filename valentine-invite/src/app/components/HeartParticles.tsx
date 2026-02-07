@@ -54,7 +54,7 @@ const HeartParticles = () => {
         events: {
           onHover: { enable: true, mode: "repulse" },
           onClick: { enable: false },
-          resize: true,
+          resize: { enable: true },
         },
         modes: {
           repulse: {
