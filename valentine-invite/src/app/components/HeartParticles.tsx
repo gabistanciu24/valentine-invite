@@ -3,6 +3,7 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import { initParticlesEngine, Particles } from "@tsparticles/react";
 import { loadFull } from "tsparticles";
+import type { IOptions } from "tsparticles-engine";
 
 const HeartParticles = () => {
   const [ready, setReady] = useState(false);
@@ -15,7 +16,7 @@ const HeartParticles = () => {
     });
   }, []);
 
-  const options = useMemo(
+  const options = useMemo<Partial<IOptions>>(
     () => ({
       fullScreen: { enable: false },
       background: { color: { value: "transparent" } },
@@ -37,12 +38,12 @@ const HeartParticles = () => {
           },
         },
         size: { value: { min: 16, max: 34 } },
-        move: {
-          enable: true,
-          speed: 1.2,
-          direction: "bottom",
-          outModes: { default: "out" },
-        },
+          move: {
+            enable: true,
+            speed: 1.2,
+            direction: "bottom",
+            outModes: { default: "out" },
+          },
         shadow: {
           enable: true,
           color: "#ff7ab6",
