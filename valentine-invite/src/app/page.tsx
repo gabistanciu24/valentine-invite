@@ -19,7 +19,10 @@ export default function Home() {
   const [nameError, setNameError] = useState<string | null>(null);
   const [gifMode, setGifMode] = useState<"cute" | "angry">("cute");
 
-  const baseColor = useMemo(() => [0.1, 0.1, 0.1] as const, []);
+  const baseColor = useMemo<[number, number, number]>(
+    () => [0.1, 0.1, 0.1],
+    [],
+  );
 
   const CUTE_GIF_URL =
     "https://media1.tenor.com/m/E4auL-XxaaYAAAAd/floreyonce-cat.gif";
