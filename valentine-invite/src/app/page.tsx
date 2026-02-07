@@ -1,66 +1,196 @@
-import Image from "next/image";
+"use client";
+
+import { useMemo, useState } from "react";
+import LiquidChrome from "./components/Liquidchrome/LiquidChrome";
+import HeartParticles from "./components/HeartParticles";
+import SplitText from "./components/SplitText/SplitText";
+import NameScreen from "./components/NameScreen";
+import ValentineQ1 from "./components/ValentineQ1";
+import ValentineQ2 from "./components/ValentineQ2";
+import FinalScreen from "./components/FinalScreen";
+import LoveLetter from "./components/LoveLetter";
 import styles from "./page.module.css";
 
+type Stage = "letter" | "play" | "name" | "q1" | "q2" | "final";
+
 export default function Home() {
+  const [stage, setStage] = useState<Stage>("letter");
+  const [acceptedName, setAcceptedName] = useState("");
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [gifMode, setGifMode] = useState<"cute" | "angry">("cute");
+
+  const baseColor = useMemo(() => [0.1, 0.1, 0.1] as const, []);
+
+  const CUTE_GIF_URL =
+    "https://media1.tenor.com/m/E4auL-XxaaYAAAAd/floreyonce-cat.gif";
+  const ANGRY_GIF_URL =
+    "https://media1.tenor.com/m/fW6KOfqgqSQAAAAd/amma-cat-ts-js-pmo-icl.gif";
+
+  const gifUrl = useMemo(
+    () => (gifMode === "cute" ? CUTE_GIF_URL : ANGRY_GIF_URL),
+    [gifMode],
+  );
+
+  function handleNameSubmit(value: string) {
+    const raw = value.trim();
+    const n = raw.toLowerCase();
+
+    const ok = ["millie", "mili", "milaana"];
+    const bea = ["bea", "beatrice"];
+
+    if (!raw) {
+      setGifMode("angry");
+      setNameError("Scrie numele, nu mă lăsa în aer.");
+      return;
+    }
+
+    if (ok.includes(n)) {
+      setGifMode("cute");
+      setNameError(null);
+      setAcceptedName(raw);
+      setStage("q1");
+      return;
+    }
+
+    if (bea.includes(n)) {
+      setGifMode("cute");
+      setNameError(
+        "Știu că și mama și prietena ta sunt prințese... dar îmi trebuie ACEA prințesă.",
+      );
+      return;
+    }
+
+    if (n === "flavius") {
+      setGifMode("angry");
+      setNameError("Am spus prințesă, nu prinț :))");
+      return;
+    }
+
+    setGifMode("angry");
+    setNameError("Am spus nume de prințesă, nu răpănoase.");
+  }
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className={styles.stage}>
+      <div className={styles.bg}>
+        <LiquidChrome
+          baseColor={baseColor}
+          speed={0.15}
+          amplitude={0.55}
+          interactive={false}
         />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.tsx file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      </div>
+
+      <div className={styles.particles}>
+        <HeartParticles />
+      </div>
+
+      <LoveLetter
+        visible={stage === "letter"}
+        onStart={() => {
+          setStage("play");
+          setGifMode("cute");
+          setNameError(null);
+        }}
+      />
+
+      <div className={styles.heroFrame} data-hero-frame>
+        <span className={`${styles.cornerHeart} ${styles.cornerHeartTL}`} />
+        <span className={`${styles.cornerHeart} ${styles.cornerHeartBR}`} />
+
+        <div className={styles.centerStack}>
+          <div className={styles.tenorWrap}>
+            <img
+              className={styles.heroGif}
+              src={gifUrl}
+              alt={gifMode === "cute" ? "Cute cat gif" : "Angry cat gif"}
+              loading="eager"
+              draggable={false}
             />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </div>
+
+          <SplitText
+            text={
+              nameError ??
+              (stage === "final"
+                ? "Confirmare?"
+                : stage === "q2"
+                  ? "Sigur sigur?"
+                  : stage === "q1"
+                    ? "Will you be my Valentine?"
+                    : "Ce spui de o felicitare de V-Day my way? :)")
+            }
+            className={`${styles.splitText} ${
+              nameError ? styles.splitTextError : ""
+            }`}
+            delay={50}
+            duration={1.25}
+            ease="power3.out"
+            splitType="chars"
+            from={{ opacity: 0, y: 40 }}
+            to={{ opacity: 1, y: 0 }}
+            threshold={0.1}
+            rootMargin="-100px"
+            textAlign="center"
+          />
+
+          <div className={styles.actionSlot}>
+            <button
+              type="button"
+              className={`${styles.btn} ${
+                stage === "play" ? styles.isVisible : styles.isHidden
+              }`}
+              onClick={() => {
+                setStage("name");
+                setNameError(null);
+                setGifMode("cute");
+              }}
+            >
+              <strong className={styles.label}>Doresc</strong>
+
+              <div className={styles.containerStars}>
+                <div className={styles.stars}></div>
+              </div>
+
+              <div className={styles.glow}>
+                <div className={styles.circle}></div>
+                <div className={styles.circle}></div>
+              </div>
+            </button>
+
+            <NameScreen
+              visible={stage === "name"}
+              onSubmit={handleNameSubmit}
+              onTyping={() => {
+                setNameError(null);
+                setGifMode("cute");
+              }}
+            />
+
+            <FinalScreen
+              visible={stage === "final"}
+              acceptedName={acceptedName}
+            />
+          </div>
+
+          <button
+            type="button"
+            className={styles.miniReset}
+            onClick={() => {
+              setStage("letter");
+              setAcceptedName("");
+              setGifMode("cute");
+              setNameError(null);
+            }}
           >
-            Documentation
-          </a>
+            reset
+          </button>
         </div>
-      </main>
-    </div>
+      </div>
+
+      <ValentineQ1 visible={stage === "q1"} onYes={() => setStage("q2")} />
+
+      <ValentineQ2 visible={stage === "q2"} onSure={() => setStage("final")} />
+    </main>
   );
 }
